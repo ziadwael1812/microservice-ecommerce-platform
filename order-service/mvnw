@@ -1,0 +1,102 @@
+#!/bin/sh
+
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+# -----------------------------------------------------------------------------
+# Maven Start Script
+#
+# Optional ENV vars
+# -----------------------------------------------------------------------------
+#   M2_HOME          Point to a Maven installation.
+#   MAVEN_OPTS       Java options to pass to the Maven execution.
+#                    Default is "-Xms256m -Xmx512m".
+#   MAVEN_SKIP_RC    Flag to disable the loading of /etc/mavenrc and ~/.mavenrc files.
+# -----------------------------------------------------------------------------
+
+MAVEN_PROJECTBASEDIR="$(cd "$(dirname "$0")" > /dev/null && pwd)"
+MAVEN_SETTINGS="$MAVEN_PROJECTBASEDIR/.mvn/maven.config"
+
+if [ -n "$MAVEN_SKIP_RC" ]; then
+  MAVEN_SKIP_RC=true
+else
+  MAVEN_SKIP_RC=false
+fi
+
+if [ -z "$MAVEN_OPTS" ]; then
+  MAVEN_OPTS="$(mvn_get_opts_from_config "$MAVEN_SETTINGS")"
+fi
+
+# Read `MAVEN_OPTS` into an array respects quotes.
+MAVEN_OPTS_ARRAY=() # Initialize as an empty array
+if [ -n "$MAVEN_OPTS" ]; then
+  eval "MAVEN_OPTS_ARRAY=($MAVEN_OPTS)"
+fi
+
+# Detect M2_HOME if not set
+if [ -z "$M2_HOME" ]; then
+  # Try to detect M2_HOME from mvn executable in PATH
+  MVN_EXECUTABLE="$(which mvn)"
+  if [ -n "$MVN_EXECUTABLE" ] && [ -f "$MVN_EXECUTABLE" ]; then
+    M2_HOME="$(cd "$(dirname "$MVN_EXECUTABLE")/.." && pwd)"
+  fi
+fi
+
+# Home for all things related to the Maven wrapper
+WRAPPER_DIR="$MAVEN_PROJECTBASEDIR/.mvn/wrapper"
+MAVEN_WRAPPER_JAR="$WRAPPER_DIR/maven-wrapper.jar"
+MAVEN_WRAPPER_PROPERTIES="$WRAPPER_DIR/maven-wrapper.properties"
+
+# For Cygwin, ensure paths are in UNIX format before Ant processing
+if $cygwin; then
+  [ -n "$M2_HOME" ] && M2_HOME=$(cygpath --unix "$M2_HOME")
+  [ -n "$JAVA_HOME" ] && JAVA_HOME=$(cygpath --unix "$JAVA_HOME")
+  [ -n "$MAVEN_PROJECTBASEDIR" ] && MAVEN_PROJECTBASEDIR=$(cygpath --unix "$MAVEN_PROJECTBASEDIR")
+  [ -n "$MAVEN_WRAPPER_JAR" ] && MAVEN_WRAPPER_JAR=$(cygpath --unix "$MAVEN_WRAPPER_JAR")
+  [ -n "$MAVEN_WRAPPER_PROPERTIES" ] && MAVEN_WRAPPER_PROPERTIES=$(cygpath --unix "$MAVEN_WRAPPER_PROPERTIES")
+fi
+
+#Decode wrapper properties
+if [ -r "$MAVEN_WRAPPER_PROPERTIES" ]; then
+  distributionUrl=$(grep '^distributionUrl=' "$MAVEN_WRAPPER_PROPERTIES" | sed 's/distributionUrl=//')
+else
+  echo "- ERROR: Could not find or read the Maven wrapper properties file '$MAVEN_WRAPPER_PROPERTIES'." >&2
+  exit 1
+fi
+
+if [ ! -r "$MAVEN_WRAPPER_JAR" ]; then
+  echo "- INFO: Downloading Maven wrapper from $distributionUrl"
+  if ! mkdir -p "$WRAPPER_DIR"; then
+    echo "- ERROR: Failed to create directory '$WRAPPER_DIR'"
+    exit 1
+  fi
+  if ! curl -f -L -o "$MAVEN_WRAPPER_JAR" "$distributionUrl"; then
+    echo "- ERROR: Failed to download Maven wrapper from $distributionUrl."
+    echo "- INFO: Please check your network connection and try again."
+    exit 1
+  fi
+fi
+
+# Execute Maven
+"$JAVA_HOME/bin/java" \
+  $JVM_CONFIG_MAVEN_PROPS \
+  $MAVEN_OPTS \
+  -classpath "$MAVEN_WRAPPER_JAR" \
+  "-Dmaven.home=$M2_HOME" \
+  "-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR" \
+  org.apache.maven.wrapper.MavenWrapperMain \
+  "$@"
