@@ -1,0 +1,48 @@
+# Sample configuration file for user-service (user-service.yml)
+
+server:
+  port: 8081 # Default port for user-service, can be overridden by instance config
+
+spring:
+  application:
+    name: user-service
+  datasource:
+    url: jdbc:postgresql://user-db:5432/user_service_db
+    username: ${DB_USER_USERNAME:-postgres} # Allow override via env var
+    password: ${DB_USER_PASSWORD:-postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # or validate in production
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  rabbitmq:
+    host: ${RABBITMQ_HOST:-rabbitmq}
+    port: ${RABBITMQ_PORT:-5672}
+    username: ${RABBITMQ_USERNAME:-guest} # Default RabbitMQ credentials
+    password: ${RABBITMQ_PASSWORD:-guest}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL:-http://service-registry:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+    # hostname: user-service # Not strictly necessary if prefer-ip-address is true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics,env,beans,configprops,mappings,refresh,heapdump,threaddump
+  endpoint:
+    health:
+      show-details: always
+
+# Application-specific properties for User Service
+app:
+  jwt:
+    secret: YourSuperSecretKeyForUserServiceJWTWhichShouldBeLongAndRandomAndAtLeast256Bits
+    expirationMs: 86400000 # 24 hours
