@@ -1,0 +1,10 @@
+# bootstrap.yml for config-server (Usually empty or minimal as it IS the config source)
+# Config server does not fetch its own config from itself in most cases.
+# Its primary configuration is in application.yml.
+
+# spring:
+#   application:
+#     name: config-server # Self-reference if needed for some advanced scenarios
+#   cloud:
+#     config:
+#       uri: http://localhost:8888 # Points to itself (not typical)
