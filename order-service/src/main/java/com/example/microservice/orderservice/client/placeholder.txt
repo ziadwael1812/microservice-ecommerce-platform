@@ -1,0 +1,1 @@
+This package will contain Feign clients for inter-service communication.
