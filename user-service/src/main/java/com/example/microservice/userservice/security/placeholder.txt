@@ -1,0 +1,1 @@
+This package will contain security-specific classes like UserDetailsServiceImpl, JwtUtils, WebSecurityConfig.
