@@ -1,0 +1,1 @@
+This package will contain custom exception classes for the product service.
