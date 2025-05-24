@@ -1,0 +1,74 @@
+# Sample configuration for api-gateway (api-gateway.yml)
+
+server:
+  port: 8080 # Port for the API Gateway
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true # Enables discovering services from Eureka
+          lower-case-service-id: true # Converts service IDs to lowercase for route matching
+      routes:
+        # User Service: /api/auth/** (for login/register), /api/users/** (for user management)
+        - id: user-service-route
+          uri: lb://USER-SERVICE # lb for load balancing via Eureka, USER-SERVICE is the registered service name
+          predicates:
+            - Path=/api/auth/**, /api/users/**
+          filters:
+            - StripPrefix=2 # Strips /api/auth or /api/users, leaving the rest for the service
+                            # e.g. /api/auth/signin -> /signin on user-service
+
+        # Product Service: /api/products/**
+        - id: product-service-route
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/products/**
+          filters:
+            - StripPrefix=2 # /api/products -> /
+
+        # Order Service: /api/orders/**
+        - id: order-service-route
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/orders/**
+          filters:
+            - StripPrefix=2 # /api/orders -> /
+            
+  # Gateway actuator endpoints for health, info etc.
+  # These are on a different port if management.server.port is set
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL:-http://service-registry:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true # API Gateway can also be a client of Eureka
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway,health,info,prometheus,metrics,env # Add other relevant ones
+  endpoint:
+    health:
+      show-details: always
+
+# Logging levels
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE # For detailed gateway logging during development
+    reactor.netty: TRACE
+
+# JWT Secret for validating tokens at gateway (if gateway handles auth directly)
+# This should be the same secret used by the auth service to sign tokens, or use public key.
+# For this example, let's assume user-service handles token generation and validation, 
+# and gateway might pass it through or use a global filter for pre-authentication.
+app:
+  jwt:
+    secret: YourSuperSecretKeyForUserServiceJWTWhichShouldBeLongAndRandomAndAtLeast256Bits # Must match user-service
