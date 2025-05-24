@@ -1,0 +1,77 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+.project
+.classpath
+.settings/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# NetBeans
+nbproject/private/
+build/
+dist/
+nbdist/
+.nb-gradle/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+# Docker
+.dockerignore
+.docker/
+
+# Secrets
+*.pem
+*.key
+
+# Gradle
+.gradle/
+build/
+
+# node.js
+node_modules/
+dist/
+coverage/
+
+# Spring Boot Jar / War files
+*.jar
+*.war
+
+# Config server repo (if local)
+config-repo/
