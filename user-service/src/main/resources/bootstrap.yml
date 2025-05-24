@@ -1,0 +1,31 @@
+# bootstrap.yml for User Service
+# This file is loaded before application.yml.
+# Used to fetch configuration from the Spring Cloud Config Server.
+
+spring:
+  application:
+    name: user-service # This MUST match the name of the config file in config-repo (e.g., user-service.yml)
+  profiles:
+    active: default # Corresponds to the profile in the config file name (e.g., user-service-default.yml or user-service.yml)
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_URL:http://config-server:8888} # Address of the config server
+      fail-fast: true # Service will fail to start if it cannot connect to the config server
+      retry:
+        max-attempts: 20         # Number of retry attempts
+        initial-interval: 1500   # Initial retry interval in ms
+        multiplier: 1.5          # Multiplier for the next interval
+        max-interval: 5000       # Maximum retry interval in ms
+
+# Eureka client settings are typically managed by the Config Server (in user-service.yml)
+# However, for discovery-first bootstrap, you might define a minimal Eureka client here.
+# For this setup, we expect Eureka config to come from the Config Server.
+# eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: ${EUREKA_URL:http://service-registry:8761/eureka/}
+#    register-with-eureka: true
+#    fetch-registry: true
+#  instance:
+#    prefer-ip-address: true
+#    # hostname: user-service # Can be useful in some environments
