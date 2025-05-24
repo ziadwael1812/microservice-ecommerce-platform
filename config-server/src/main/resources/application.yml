@@ -1,0 +1,29 @@
+# application.yml for Config Server
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native # Use native profile to serve config from local filesystem for simplicity
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:./config-repo/ # Points to a directory within the config-server itself
+          # For a Git-backed config server, you would use:
+          # git:
+          #   uri: https://github.com/your-username/config-repo.git
+          #   clone-on-start: true
+          #   default-label: main
+
+# Ensure the health endpoint is enabled for Docker health checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
