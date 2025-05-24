@@ -1,0 +1,21 @@
+# application.yml for User Service
+# Minimal local config, most will come from Config Server (user-service.yml in config-repo)
+
+# server.port=8081 (Will be fetched from config server or overridden by Docker environment)
+
+# Basic health check exposure, more detailed config (like DB health) should be in config-server's user-service.yml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info # Keep it minimal here, expose more via Config Server if needed
+  endpoint:
+    health:
+      show-details: never # Or 'when-authorized' or 'always'. 'never' is safer for default local fallback.
+
+# Logging settings (can also be managed by config server)
+# logging:
+#   level:
+#     com.example.microservice.userservice: DEBUG
+#     org.springframework.web: INFO
+#     org.springframework.security: INFO
