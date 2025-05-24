@@ -1,0 +1,30 @@
+# bootstrap.yml for API Gateway
+# This file is loaded before application.yml.
+# It's used to fetch configuration from the Spring Cloud Config Server.
+
+spring:
+  application:
+    name: api-gateway # This MUST match the name of the config file in config-repo (e.g., api-gateway.yml)
+  profiles:
+    active: default # Corresponds to the profile in the config file name
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_URL:http://config-server:8888} # Address of the config server
+      fail-fast: true # Service will fail to start if it cannot connect to the config server
+      retry:
+        max-attempts: 20
+        initial-interval: 1500
+        multiplier: 1.5
+        max-interval: 5000
+
+# Eureka client configuration should be fetched from Config Server as part of api-gateway.yml
+# However, if you need to specify Eureka settings *before* config server is contacted (e.g., for discovery-first bootstrap),
+# you might put minimal Eureka client settings here. But typically, it's better to manage it via Config Server.
+# eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: ${EUREKA_URL:http://service-registry:8761/eureka/}
+#    register-with-eureka: true
+#    fetch-registry: true
+#  instance:
+#    prefer-ip-address: true
