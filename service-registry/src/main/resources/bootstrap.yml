@@ -1,0 +1,22 @@
+# bootstrap.yml for service-registry
+# This file is loaded before application.yml.
+# It's used to fetch configuration from the Spring Cloud Config Server.
+
+spring:
+  application:
+    name: service-registry # This MUST match the name of the config file in config-repo (e.g., service-registry.yml)
+  profiles:
+    active: default # Corresponds to the profile in the config file name (e.g., service-registry-default.yml or service-registry.yml)
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_URL:http://config-server:8888} # Address of the config server (use Docker service name)
+      fail-fast: true # Service will fail to start if it cannot connect to the config server
+      retry:
+        max-attempts: 20
+        initial-interval: 1500
+        multiplier: 1.5
+        max-interval: 5000
+
+# Note: Eureka server typically does not need to fetch Eureka client settings for itself via config server,
+# as its primary role is to BE the server. Its own client properties (like register-with-eureka: false)
+# are usually set directly in its application.yml.
