@@ -1,0 +1,37 @@
+# application.yml for Service Registry (Eureka Server)
+server:
+  port: 8761
+
+spring:
+  application:
+    name: service-registry
+  # Security for Eureka Dashboard (Basic Auth)
+  # security:
+  #   user:
+  #     name: eureka-admin # Replace with your desired username
+  #     password: ${EUREKA_ADMIN_PASSWORD:StrongPassword123} # Replace or use env variable
+
+eureka:
+  client:
+    register-with-eureka: false # This is a Eureka server, it doesn't register itself as a client
+    fetch-registry: false       # It also doesn't fetch registry information from other servers (in standalone mode)
+    # For a multi-instance Eureka setup, these would be true and serviceUrl would point to peers.
+  server:
+    wait-time-in-ms-when-sync-empty: 0 # Optional: Speeds up startup in a single-node dev environment
+    # renewal-percent-threshold: 0.85 # Optional: Configure renewal threshold
+    # enable-self-preservation: true # Recommended for production, can be false in dev if preferred
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# To access Eureka dashboard if Spring Security is enabled on classpath
+# http.authorizeHttpRequests(requests -> requests.anyRequest().authenticated());
+# http.httpBasic();
+# http.csrf(csrf -> csrf.ignoringRequestMatchers("/eureka/**"));
+# Refer to SecurityConfig if you add one.
