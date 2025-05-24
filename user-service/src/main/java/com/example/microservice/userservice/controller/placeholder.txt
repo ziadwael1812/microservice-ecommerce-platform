@@ -1,0 +1,1 @@
+This package will contain REST controllers for user-related APIs (auth, user management).
