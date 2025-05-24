@@ -1,0 +1,87 @@
+# Sample configuration file for order-service (order-service.yml)
+
+server:
+  port: 8083 # Default port for order-service
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: jdbc:postgresql://order-db:5432/order_service_db
+    username: ${DB_ORDER_USERNAME:-postgres}
+    password: ${DB_ORDER_PASSWORD:-postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  rabbitmq:
+    host: ${RABBITMQ_HOST:-rabbitmq}
+    port: ${RABBITMQ_PORT:-5672}
+    username: ${RABBITMQ_USERNAME:-guest}
+    password: ${RABBITMQ_PASSWORD:-guest}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL:-http://service-registry:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+# Feign client timeouts
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000 # Increased read timeout for potentially longer operations
+  # Enable circuit breakers for Feign clients if Resilience4j is on the classpath
+  circuitbreaker:
+    enabled: true
+
+# Resilience4j Circuit Breaker configuration
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+    instances:
+      productService: # Matches Feign client name or a custom name
+        baseConfig: default
+      userService:
+        baseConfig: default
+  # TimeLimiter configuration (optional, useful with circuit breakers)
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 2s
+        cancelRunningFuture: true
+    instances:
+      productService:
+        baseConfig: default
+      userService:
+        baseConfig: default
+
+# Application-specific properties for Order Service
+app:
+  productServiceUrl: http://PRODUCT-SERVICE # Service ID registered with Eureka
+  userServiceUrl: http://USER-SERVICE     # Service ID registered with Eureka
