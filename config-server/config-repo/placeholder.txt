@@ -1,0 +1,4 @@
+# Config files for services will go here.
+# For example: user-service.yml, product-service.yml, etc.
+
+# This is a placeholder file to ensure the directory is created.
