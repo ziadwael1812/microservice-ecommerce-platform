@@ -1,0 +1,1 @@
+This package will contain JPA entity classes for orders and order items.
