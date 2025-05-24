@@ -1,0 +1,1 @@
+This package will contain REST controllers for handling product-related HTTP requests.
