@@ -1,0 +1,1 @@
+This package will contain business logic services (e.g., AuthService, UserServiceImpl).
