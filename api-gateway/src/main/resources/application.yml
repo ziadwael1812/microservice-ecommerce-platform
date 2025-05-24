@@ -1,0 +1,13 @@
+# application.yml for API Gateway
+# This file will be minimal as most configuration should come from the Config Server.
+# It primarily contains the application name and port, if not overridden by config server or environment.
+
+# server.port=8080 (This will typically be set by the config server via api-gateway.yml or by Docker Compose)
+
+# spring.application.name=api-gateway (This is crucial and will be set in bootstrap.yml to fetch config)
+
+# Logging can be configured here if needed, but also often managed by config server.
+# logging:
+#   level:
+#     org.springframework.cloud.gateway: INFO
+#     reactor.netty: INFO
