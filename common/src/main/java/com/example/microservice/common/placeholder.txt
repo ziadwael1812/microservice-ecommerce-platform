@@ -1,0 +1,7 @@
+This directory will contain common DTOs, utility classes, exceptions, etc.
+shared across microservices.
+
+Examples:
+- com.example.microservice.common.dto.UserDto.java
+- com.example.microservice.common.exception.ResourceNotFoundException.java
+- com.example.microservice.common.util.DateUtils.java
