@@ -1,0 +1,176 @@
+version: '3.8'
+
+services:
+  config-server:
+    build: ./config-server
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - ecommerce-network
+
+  service-registry:
+    build: ./service-registry
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_URL=http://config-server:8888
+    networks:
+      - ecommerce-network
+
+  rabbitmq:
+    image: rabbitmq:3.9-management-alpine
+    ports:
+      - "5672:5672" # RabbitMQ port
+      - "15672:15672" # RabbitMQ Management UI
+    networks:
+      - ecommerce-network
+    healthcheck:
+        test: ["CMD", "rabbitmqctl", "status"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+
+  user-db:
+    image: postgres:14-alpine
+    ports:
+      - "5433:5432" # Expose on a different host port if default 5432 is used
+    environment:
+      - POSTGRES_DB=user_service_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  product-db:
+    image: postgres:14-alpine
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_DB=product_service_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  order-db:
+    image: postgres:14-alpine
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_DB=order_service_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - order_db_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "8081:8081" # Port for user-service
+    depends_on:
+      config-server:
+        condition: service_healthy # Wait for config server to be healthy if healthcheck is defined
+      service-registry:
+        condition: service_healthy # Wait for eureka
+      user-db:
+        condition: service_started # Or service_healthy if db has healthcheck
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_URL=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/user_service_db
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    networks:
+      - ecommerce-network
+
+  product-service:
+    build: ./product-service
+    ports:
+      - "8082:8082" # Port for product-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      product-db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_URL=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://product-db:5432/product_service_db
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    networks:
+      - ecommerce-network
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "8083:8083" # Port for order-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      order-db:
+        condition: service_started
+      user-service:
+        condition: service_healthy 
+      product-service:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_URL=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://order-db:5432/order_service_db
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    networks:
+      - ecommerce-network
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080" # Main entry point
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_URL=http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
+    networks:
+      - ecommerce-network
+
+volumes:
+  user_db_data:
+  product_db_data:
+  order_db_data:
+
+networks:
+  ecommerce-network:
+    driver: bridge
