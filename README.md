@@ -4,7 +4,6 @@ This project demonstrates a microservice architecture for an e-commerce applicat
 
 ## 🏗️ Architecture Overview
 
-*(A visual diagram of the architecture would be highly beneficial here. You can create one and embed it, e.g., `![Architecture Diagram](diagrams/architecture.png)`)*
 
 <!-- Example placeholder for an architecture diagram -->
 <!-- ![Architecture Diagram](diagrams/microservice_architecture.png) -->
